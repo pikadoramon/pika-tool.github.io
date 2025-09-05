@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>更多工具 - 免费开发者工具箱</title>
+   <meta name="description" content="免费在线JSON格式化、Header格式化、时间戳转换工具，支持JSON美化、校验、转换，一站式解决开发调试常见问题。Free online JSON formatter, header formatter, and timestamp converter. Beautify, validate, and transform data instantly.">
+
+  <meta name="keywords" content="JSON格式化, JSON美化, 在线JSON工具, JSON校验, Header格式化, HTTP请求头工具, 时间戳转换, Unix时间戳, 开发者工具, 免费工具箱, JSON Formatter, JSON Validator, Online JSON Tool, Header Formatter, HTTP Header Tool, Timestamp Converter, Unix Time Converter, Developer Tools, Free Toolbox">
+
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="开发者工具箱 / Developer Toolbox">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="canonical" href="https://pika-tool.github.io/">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="在线JSON格式化 | Header格式化 | 时间戳转换工具 | Online JSON Formatter | Header Formatter | Timestamp Converter">
+  <meta property="og:description" content="免费在线JSON格式化、Header格式化、时间戳转换工具，支持快速美化、校验和转换。Free online JSON, Header, and Timestamp tools for developers.">
+  <meta property="og:url" content=https://pika-tool.github.io/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="开发者工具箱 | Developer Toolbox">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="在线JSON格式化 | Header格式化 | 时间戳转换工具 | Online JSON Formatter">
+  <meta name="twitter:description" content="免费在线JSON、Header、时间戳转换工具。Free online JSON, Header, and Timestamp tools.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background-color: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .left-panel, .right-panel {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn.success {
+            background: #27ae60;
+        }
+
+        .btn.success:hover {
+            background: #229954;
+        }
+
+        .btn.warning {
+            background: #f39c12;
+        }
+
+        .btn.warning:hover {
+            background: #e67e22;
+        }
+
+        .input-area {
+            flex: 1;
+            padding: 0;
+            border: none;
+            outline: none;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            background: #fafafa;
+        }
+
+        .output-area {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+            background: #fafafa;
+            position: relative;
+            min-height: 0; /* 关键：防止flex子项被内容撑高 */
+            max-height: 100%;
+            box-sizing: border-box;
+            word-break: break-all; /* 防止长字符串撑破 */
+        }
+
+        #formattedJson {
+            min-width: 0;
+            word-break: break-all;
+            white-space: pre-wrap; /* 保证内容自动换行 */
+        }
+
+        .json-node {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .json-key {
+            color: #8e44ad;
+            font-weight: bold;
+        }
+
+        .json-string {
+            color: #27ae60;
+        }
+
+        .json-number {
+            color: #e74c3c;
+        }
+
+        .json-boolean {
+            color: #f39c12;
+        }
+
+        .json-null {
+            color: #95a5a6;
+        }
+
+        .json-bracket {
+            color: #34495e;
+            font-weight: bold;
+        }
+
+        .expandable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .expandable:before {
+            content: '▼ ';
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .collapsed:before {
+            content: '▶ ';
+        }
+
+        .collapsed + .json-content {
+            display: none;
+        }
+
+        .json-content {
+            margin-left: 20px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: #2c3e50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        .path-info {
+            position: absolute;
+            top: 18px;      /* 距离输出区顶部 */
+            right: 24px;    /* 距离输出区右侧 */
+            z-index: 10;
+            background: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            padding: 10px 16px;
+            font-size: 12px;
+            min-width: 180px;
+            max-width: 60%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            pointer-events: none;
+        }
+
+        .path-info strong {
+            color: #2c3e50;
+        }
+
+        .level-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        .level-input {
+            width: 50px;
+            padding: 4px;
+            border: 1px solid #bdc3c7;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            background: #fadbd8;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .copy-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 1001;
+            display: none;
+        }
+
+        .copy-toast.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="panel-header">
+                <span>JSON输入</span>
+                <div class="controls">
+                    <select id="methodSelect" class="btn" style="background:#fff;color:#2c3e50;border:1px solid #bdc3c7;">
+                        <option value="format">格式化</option>
+                        <option value="compress">压缩</option>
+                        <option value="valixiangyingdeshujudate">校验</option>
+                    </select>
+                    <button class="btn success" onclick="formatJSON()">提交</button>
+                    <button class="btn" onclick="clearAll()">清空</button>
+                </div>
+            </div>
+            <textarea class="input-area" id="jsonInput" placeholder="请在此处输入JSON数据...">
+请输入相应的数据            </textarea>
+        </div>
+
+        <div class="right-panel">
+            <div class="panel-header">
+                <span>格式化输出</span>
+                <div class="controls">
+        
+                     <button class="btn success" onclick="copyJSON()">复制</button>
+                </div>
+            </div>
+            <div class="output-area" id="jsonOutput">
+               
+                <div id="formattedJson">点击"提交"按钮开始...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+    <div class="copy-toast" id="copyToast">复制成功！</div>
+
+    <script>
+        let jsonData = null;
+        let currentExpandLevel = 2;
+
+        function formatJSON() {
+            const input = document.getElementById('jsonInput').value.trim();
+            const output = document.getElementById('jsonOutput');
+            const formattedDiv = document.getElementById('formattedJson');
+            const method = document.getElementById('methodSelect').value;
+            if (!input) {
+                formattedDiv.innerHTML = '<div class="error-message">请输入JSON数据</div>';
+                return;
+            }
+
+            try {
+                const formatted = '<div class="info-message">输出:'+method+'-:-'+input+'</div>';
+                formattedDiv.innerHTML = formatted;
+            } catch (error) {
+                formattedDiv.innerHTML = `<div class="error-message">JSON格式错误: ${error.message}</div>`;
+            }
+        }
+
+        function copyJSON() {
+            const formattedDiv = document.getElementById('formattedJson');
+            if (!formattedDiv) {
+                formattedDiv.innerHTML = '<div class="error-message">请输入JSON数据</div>';
+                return;
+            }
+            try {
+                navigator.clipboard.writeText(formattedDiv.textContent);
+                showCopyToast();
+                
+            } catch (error) {
+                formattedDiv.innerHTML = `<div class="error-message">JSON格式错误: ${error.message}</div>`;
+            }
+        }
+
+        function showCopyToast() {
+            const toast = document.getElementById('copyToast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 1500);
+        }
+
+        function compressJSON() {
+            const input = document.getElementById('jsonInput').value.trim();
+
+            if (!input) {
+                alert('请先输入JSON数据');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(input);
+                const compressed = JSON.stringify(parsed);
+                document.getElementById('jsonInput').value = compressed;
+            } catch (error) {
+                alert('JSON格式错误: ' + error.message);
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('formattedJson').innerHTML = '点击"提交"按钮开始...';
+            document.getElementById('pathInfo').style.display = 'none';
+        }
+
+     
+
+
+        // 初始化
+        window.onload = function() {
+            formatJSON();
+        };
+    </script>
+     <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-F03RP3XNVG"></script>
+      <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-F03RP3XNVG'); </script>
+
+</body>
+</html>
