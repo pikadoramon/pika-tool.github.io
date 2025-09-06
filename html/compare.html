@@ -1,14 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Text Diff Demo</title>
+  <title>Text Comparison Tool</title>
   <!-- diff2html CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css" />
-      <link rel="stylesheet" href="../css/base.css">
-    <link rel="stylesheet" href="../css/compare.css">
-
-
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/compare.css">
 </head>
 <body>
  <script>
@@ -22,17 +20,17 @@ var _hmt = _hmt || [];
 </script>
    <div class="left-panel">
         <div class="panel-header">
-            <span>文本对比工具</span>
+            <span>Text Comparison Tool</span>
             <div class="controls">
-                <button id="diffBtn" class="btn success">生成Diff</button>
-                <button class="btn" onclick="clearAll()">清空</button>
+                <button id="diffBtn" class="btn success">Generate Diff</button>
+                <button class="btn" onclick="clearAll()">Clear</button>
             </div>
         </div>
     </div>
 
     <div class="textarea-row">
-        <textarea id="text1" placeholder="输入原始文本"></textarea>
-        <textarea id="text2" placeholder="输入修改后的文本"></textarea>
+        <textarea id="text1" placeholder="Enter original text"></textarea>
+        <textarea id="text2" placeholder="Enter modified text"></textarea>
     </div>
     <div class="diff-container" id="diff"></div>
 
@@ -58,10 +56,10 @@ var _hmt = _hmt || [];
 
       document.getElementById("diff").innerHTML = diffHtml;
     });
-       function clearAll() {
-            document.getElementById('text1').value = '';
-            document.getElementById('text2').value = '';
-        };
+    function clearAll() {
+      document.getElementById('text1').value = '';
+      document.getElementById('text2').value = '';
+    };
   </script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-TT43YPBTFC"></script>
 <script>

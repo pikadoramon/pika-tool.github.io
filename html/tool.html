@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>更多工具 - 免费开发者工具箱</title>
+      <title>More Tools - Developer Toolbox</title>
    <meta name="description" content="免费在线JSON格式化、Header格式化、时间戳转换工具，支持JSON美化、校验、转换，一站式解决开发调试常见问题。Free online JSON formatter, header formatter, and timestamp converter. Beautify, validate, and transform data instantly.">
 
   <meta name="keywords" content="JSON格式化, JSON美化, 在线JSON工具, JSON校验, Header格式化, HTTP请求头工具, 时间戳转换, Unix时间戳, 开发者工具, 免费工具箱, JSON Formatter, JSON Validator, Online JSON Tool, Header Formatter, HTTP Header Tool, Timestamp Converter, Unix Time Converter, Developer Tools, Free Toolbox">
@@ -41,38 +41,36 @@ var _hmt = _hmt || [];
     <div class="container">
         <div class="left-panel">
             <div class="panel-header">
-                <span>JSON输入</span>
+                <span>Input</span>
                 <div class="controls">
                     <select id="methodSelect" class="btn" style="background:#fff;color:#2c3e50;border:1px solid #bdc3c7;">
-                        <option value="format">格式化</option>
-                        <option value="compress">压缩</option>
-                        <option value="valixiangyingdeshujudate">校验</option>
+                        <option value="format">Format</option>
+                        <option value="compress">Compress</option>
+                        <option value="valixiangyingdeshujudate">Validate</option>
                     </select>
-                    <button class="btn success" onclick="formatJSON()">提交</button>
-                    <button class="btn" onclick="clearAll()">清空</button>
+                    <button class="btn success" onclick="formatJSON()">Submit</button>
+                    <button class="btn" onclick="clearAll()">Clear</button>
                 </div>
             </div>
-            <textarea class="input-area" id="jsonInput" placeholder="请在此处输入JSON数据...">
-请输入相应的数据            </textarea>
+            <textarea class="input-area" id="jsonInput" placeholder="Enter JSON data here...">
+Please enter your data here            </textarea>
         </div>
 
         <div class="right-panel">
             <div class="panel-header">
-                <span>格式化输出</span>
+                <span>Formatted Output</span>
                 <div class="controls">
-        
-                     <button class="btn success" onclick="copyJSON()">复制</button>
+                     <button class="btn success" onclick="copyJSON()">Copy</button>
                 </div>
             </div>
             <div class="output-area" id="jsonOutput">
-               
-                <div id="formattedJson">点击"提交"按钮开始...</div>
+                <div id="formattedJson">Click "Submit" to start...</div>
             </div>
         </div>
     </div>
 
     <div class="tooltip" id="tooltip"></div>
-    <div class="copy-toast" id="copyToast">复制成功！</div>
+    <div class="copy-toast" id="copyToast">Copied!</div>
 
     <script>
         let jsonData = null;
@@ -84,30 +82,29 @@ var _hmt = _hmt || [];
             const formattedDiv = document.getElementById('formattedJson');
             const method = document.getElementById('methodSelect').value;
             if (!input) {
-                formattedDiv.innerHTML = '<div class="error-message">请输入JSON数据</div>';
+                formattedDiv.innerHTML = '<div class="error-message">Please enter JSON data</div>';
                 return;
             }
 
             try {
-                const formatted = '<div class="info-message">输出:'+method+'-:-'+input+'</div>';
+                const formatted = `<div class="info-message">Output: ${method} -:- ${input}</div>`;
                 formattedDiv.innerHTML = formatted;
             } catch (error) {
-                formattedDiv.innerHTML = `<div class="error-message">JSON格式错误: ${error.message}</div>`;
+                formattedDiv.innerHTML = `<div class="error-message">Invalid JSON: ${error.message}</div>`;
             }
         }
 
         function copyJSON() {
             const formattedDiv = document.getElementById('formattedJson');
             if (!formattedDiv) {
-                formattedDiv.innerHTML = '<div class="error-message">请输入JSON数据</div>';
+                formattedDiv.innerHTML = '<div class="error-message">Please enter JSON data</div>';
                 return;
             }
             try {
                 navigator.clipboard.writeText(formattedDiv.textContent);
                 showCopyToast();
-                
             } catch (error) {
-                formattedDiv.innerHTML = `<div class="error-message">JSON格式错误: ${error.message}</div>`;
+                formattedDiv.innerHTML = `<div class="error-message">Invalid JSON: ${error.message}</div>`;
             }
         }
 
@@ -123,7 +120,7 @@ var _hmt = _hmt || [];
             const input = document.getElementById('jsonInput').value.trim();
 
             if (!input) {
-                alert('请先输入JSON数据');
+                alert('Please enter JSON data first');
                 return;
             }
 
@@ -132,20 +129,17 @@ var _hmt = _hmt || [];
                 const compressed = JSON.stringify(parsed);
                 document.getElementById('jsonInput').value = compressed;
             } catch (error) {
-                alert('JSON格式错误: ' + error.message);
+                alert('Invalid JSON: ' + error.message);
             }
         }
 
         function clearAll() {
             document.getElementById('jsonInput').value = '';
-            document.getElementById('formattedJson').innerHTML = '点击"提交"按钮开始...';
+            document.getElementById('formattedJson').innerHTML = 'Click "Submit" to start...';
             document.getElementById('pathInfo').style.display = 'none';
         }
 
-     
-
-
-        // 初始化
+        // Initialization
         window.onload = function() {
             formatJSON();
         };

@@ -1,4 +1,4 @@
-   * {
+* {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -192,6 +192,7 @@
             max-width: 60%;
             box-shadow: 0 2px 8px rgba(0,0,0,0.07);
             pointer-events: none;
+            user-select: auto;
         }
 
         .path-info strong {

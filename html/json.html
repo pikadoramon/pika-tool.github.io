@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>在线JSON格式化 - 免费开发者工具箱</title>
+    <title>Free online JSON formatter - Developer Toolbox</title>
   <meta name="description" content="免费在线JSON格式化、Header格式化、时间戳转换工具，支持JSON美化、校验、转换，一站式解决开发调试常见问题。Free online JSON formatter, header formatter, and timestamp converter. Beautify, validate, and transform data instantly.">
 
   <meta name="keywords" content="JSON格式化, JSON美化, 在线JSON工具, JSON校验, Header格式化, HTTP请求头工具, 时间戳转换, Unix时间戳, 开发者工具, 免费工具箱, JSON Formatter, JSON Validator, Online JSON Tool, Header Formatter, HTTP Header Tool, Timestamp Converter, Unix Time Converter, Developer Tools, Free Toolbox">
@@ -26,8 +26,271 @@
   <meta name="twitter:description" content="免费在线JSON、Header、时间戳转换工具。Free online JSON, Header, and Timestamp tools.">
 
 
-         <link rel="stylesheet" href="../css/base.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background-color: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .left-panel, .right-panel {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn.success {
+            background: #27ae60;
+        }
+
+        .btn.success:hover {
+            background: #229954;
+        }
+
+        .btn.warning {
+            background: #f39c12;
+        }
+
+        .btn.warning:hover {
+            background: #e67e22;
+        }
+
+        .input-area {
+            flex: 1;
+            padding: 0;
+            border: none;
+            outline: none;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            background: #fafafa;
+        }
+
+        .output-area {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+            background: #fafafa;
+            position: relative;
+            min-height: 0; /* 关键：防止flex子项被内容撑高 */
+            max-height: 100%;
+            box-sizing: border-box;
+            word-break: break-all; /* 防止长字符串撑破 */
+        }
+
+        #formattedJson {
+            min-width: 0;
+            word-break: break-all;
+            white-space: pre-wrap; /* 保证内容自动换行 */
+        }
+
+        .json-node {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .json-key {
+            color: #8e44ad;
+            font-weight: bold;
+        }
+
+        .json-string {
+            color: #27ae60;
+        }
+
+        .json-number {
+            color: #e74c3c;
+        }
+
+        .json-boolean {
+            color: #f39c12;
+        }
+
+        .json-null {
+            color: #95a5a6;
+        }
+
+        .json-bracket {
+            color: #34495e;
+            font-weight: bold;
+        }
+
+        .expandable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .expandable:before {
+            content: '▼ ';
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .collapsed:before {
+            content: '▶ ';
+        }
+
+        .collapsed + .json-content {
+            display: none;
+        }
+
+        .json-content {
+            margin-left: 20px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: #2c3e50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        .path-info {
+            position: sticky;
+            top: 18px;
+            right: 24px;
+            float: right;
+            z-index: 10;
+            background: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            padding: 10px 16px;
+            font-size: 12px;
+            min-width: 180px;
+            max-width: 60%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            user-select: text; /* 允许选中复制 */
+        }
+
+        .path-info strong {
+            color: #2c3e50;
+        }
+
+        .level-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        .level-input {
+            width: 50px;
+            padding: 4px;
+            border: 1px solid #bdc3c7;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            background: #fadbd8;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .copy-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 1001;
+            display: none;
+        }
+
+        .copy-toast.show {
+            display: block;
+        }
+
+        .context-menu {
+            position: fixed;
+            z-index: 2000;
+            background: #fff;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            min-width: 100px;
+            font-size: 13px;
+            user-select: none;
+        }
+
+        .context-menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            color: #2c3e50;
+        }
+
+        .context-menu-item:hover {
+            background: #f0f0f0;
+        }
+    </style>
 
 
 </head>
@@ -46,12 +309,13 @@ var _hmt = _hmt || [];
             <div class="panel-header">
                 <span>JSON输入</span>
                 <div class="controls">
-                    <button class="btn success" onclick="formatJSON()">格式化</button>
-                    <button class="btn warning" onclick="compressJSON()">压缩</button>
-                    <button class="btn" onclick="clearAll()">清空</button>
+                    <button class="btn success" onclick="formatJSON()">Format</button>
+                    <button class="btn warning" onclick="compressJSON()">Compress</button>
+                    <button class="btn" onclick="clearAll()">Clear</button>
+
                 </div>
             </div>
-            <textarea class="input-area" id="jsonInput" placeholder="请在此处输入JSON数据...">
+            <textarea class="input-area" id="jsonInput" placeholder="Input json...">
 {
     "name": "张三",
     "age": 30,
@@ -99,35 +363,34 @@ var _hmt = _hmt || [];
 
         <div class="right-panel">
             <div class="panel-header">
-                <span>格式化输出</span>
+                <span>Formatted</span>
                 <div class="controls">
                     <div class="level-control">
-                        <span>展开层数:</span>
+                        <span>Layer:</span>
                         <input type="number" class="level-input" id="expandLevel" value="2" min="0" max="10">
-                        <button class="btn" onclick="applyExpandLevel()">应用</button>
+                        <button class="btn" onclick="applyExpandLevel()">Apply</button>
                     </div>
-                    <button class="btn" onclick="expandAll()">全部展开</button>
-                    <button class="btn" onclick="collapseAll()">全部折叠</button>
-                     <button class="btn success" onclick="copyJSON()">复制</button>
-                                        <button class="btn warning" onclick="sortAndFormatJSON()">排序</button>
-
+                    <button class="btn" onclick="expandAll()">Expand</button>
+                    <button class="btn" onclick="collapseAll()">Collapse</button>
+                     <button class="btn success" onclick="copyJSON()">Copy</button>
+                    <button class="btn warning" onclick="sortAndFormatJSON()">Sort</button>
                 </div>
             </div>
             <div class="output-area" id="jsonOutput">
                 <div class="path-info" id="pathInfo" style="display: none;">
-                    <strong>路径:</strong> <span id="currentPath"></span><br>
-                    <strong>值:</strong> <span id="currentValue"></span>
+                    <strong>Path:</strong> <span id="currentPath"></span><br>
+                    <strong>Value:</strong> <span id="currentValue"></span>
                 </div>
-                <div id="formattedJson">点击"格式化"按钮开始...</div>
+                <div id="formattedJson">Click "Format" Button...</div>
             </div>
         </div>
     </div>
 
     <div class="tooltip" id="tooltip"></div>
-    <div class="copy-toast" id="copyToast">复制成功！</div>
+    <div class="copy-toast" id="copyToast">Copied！</div>
     <div class="context-menu" id="contextMenu" style="display:none;">
-        <div class="context-menu-item" data-type="path">复制路径</div>
-        <div class="context-menu-item" data-type="value">复制值</div>
+        <div class="context-menu-item" data-type="path">Copy path</div>
+        <div class="context-menu-item" data-type="value">Copy value</div>
     </div>
 
     <script>
@@ -163,7 +426,7 @@ var _hmt = _hmt || [];
             try {
                 navigator.clipboard.writeText(formattedDiv.textContent);
                 showCopyToast();
-                
+
             } catch (error) {
                 formattedDiv.innerHTML = `<div class="error-message">JSON格式错误: ${error.message}</div>`;
             }
