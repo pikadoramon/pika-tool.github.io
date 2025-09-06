@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Text Diff Demo</title>
+  <!-- diff2html CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css" />
+      <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/compare.css">
+
+
+</head>
+<body>
+ <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?bf30d700062518444c1bb4facd4d68f3";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+   <div class="left-panel">
+        <div class="panel-header">
+            <span>文本对比工具</span>
+            <div class="controls">
+                <button id="diffBtn" class="btn success">生成Diff</button>
+                <button class="btn" onclick="clearAll()">清空</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="textarea-row">
+        <textarea id="text1" placeholder="输入原始文本"></textarea>
+        <textarea id="text2" placeholder="输入修改后的文本"></textarea>
+    </div>
+    <div class="diff-container" id="diff"></div>
+
+  <!-- 引入 jsdiff（支持浏览器） -->
+  <script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
+  <!-- 引入 diff2html -->
+  <script src="https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html.min.js"></script>
+
+  <script>
+    document.getElementById("diffBtn").addEventListener("click", function() {
+      const text1 = document.getElementById("text1").value;
+      const text2 = document.getElementById("text2").value;
+
+      // 用 jsdiff 生成统一 diff 格式
+      const patch = Diff.createTwoFilesPatch("Text1", "Text2", text1, text2);
+
+      // 用 diff2html 渲染结果
+      const diffHtml = Diff2Html.html(patch, {
+        drawFileList: false,
+        matching: 'lines',
+        outputFormat: 'side-by-side'
+      });
+
+      document.getElementById("diff").innerHTML = diffHtml;
+    });
+       function clearAll() {
+            document.getElementById('text1').value = '';
+            document.getElementById('text2').value = '';
+        };
+  </script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TT43YPBTFC"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-TT43YPBTFC');
+</script>
+
+</body>
+</html>
